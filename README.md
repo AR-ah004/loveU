@@ -94,7 +94,8 @@
     <div class="container" id="container"></div>
     <div class="message" id="message">
         <h1>If I could give you one thing in life, it would be the ability to see yourself through my eyes</h1>
-        <p>only then would you realize how deeply and endlessly I love you</p>
+        <p>would you realize how deeply and endlessly I love you. You're the reason my heart beats a little faster, my days feel brighter, and my world makes sense. Loving you isn't just something I do.  
+        it's who I am now, because you're the best part of me</p>
         <div class="signature">ur lover Ayham</div>
     </div>
 
