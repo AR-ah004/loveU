@@ -25,14 +25,14 @@
         
         .heart {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             background-color: #ff6b8b;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             opacity: 0;
             animation: fadeIn 0.5s forwards;
-            box-shadow: 0 0 10px rgba(255, 107, 139, 0.5);
+            box-shadow: 0 0 12px rgba(255, 107, 139, 0.6);
         }
         
         .message {
@@ -47,7 +47,7 @@
             color: #d23669;
             width: 80%;
             max-width: 600px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
         }
         
         h1 {
@@ -71,6 +71,17 @@
             font-family: 'Brush Script MT', cursive;
         }
         
+        .butterfly {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 20 Q70 10 80 30 Q90 50 80 70 Q70 90 50 80 Q30 90 20 70 Q10 50 20 30 Q30 10 50 20" fill="%23fcc2d7"/><path d="M50 20 Q30 30 30 50 Q30 70 50 80" stroke="%23d23669" fill="none"/><path d="M50 20 Q70 30 70 50 Q70 70 50 80" stroke="%23d23669" fill="none"/></svg>');
+            background-size: contain;
+            opacity: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
         @keyframes fadeIn {
             to {
                 opacity: 0.9;
@@ -88,6 +99,12 @@
             50% { transform: translate(-50%, -50%) translateY(-10px); }
             100% { transform: translate(-50%, -50%) translateY(0px); }
         }
+        
+        @keyframes butterflyFloat {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -95,20 +112,24 @@
     <div class="message" id="message">
         <h1>If I could give you one thing in life, it would be the ability to see yourself through my eyes</h1>
         <p>only then would you realize how deeply and endlessly I love you</p>
-        <div class="signature">ur lover Ayham</div>
+        <div class="signature">Rahaf</div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('container');
             const message = document.getElementById('message');
-            const heartPoints = generateHeartPoints(window.innerWidth/2, window.innerHeight/2, Math.min(window.innerWidth, window.innerHeight)/3);
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const heartSize = Math.min(window.innerWidth, window.innerHeight) * 0.4; // 40% of screen size
+            
+            const heartPoints = generateHeartPoints(centerX, centerY, heartSize);
             
             // Draw small hearts along the heart path
             heartPoints.forEach((point, index) => {
                 setTimeout(() => {
                     createHeart(point.x, point.y, index % 7);
-                }, index * 15);
+                }, index * 10); // Faster drawing for larger heart
             });
             
             // Show message after animation completes
@@ -118,7 +139,10 @@
                 
                 // Add some floating hearts after main animation
                 setInterval(createFloatingHeart, 800);
-            }, heartPoints.length * 15 + 1000);
+                
+                // Add butterflies
+                setInterval(createButterfly, 1500);
+            }, heartPoints.length * 10 + 1000);
             
             function createHeart(x, y, colorVariant) {
                 const heart = document.createElement('div');
@@ -135,8 +159,8 @@
                 heart.style.left = `${x}px`;
                 heart.style.top = `${y}px`;
                 
-                // Random slight size variation
-                const size = 10 + Math.random() * 8;
+                // Random slight size variation (larger hearts)
+                const size = 12 + Math.random() * 10;
                 heart.style.width = `${size}px`;
                 heart.style.height = `${size}px`;
                 
@@ -147,7 +171,7 @@
             }
             
             function createFloatingHeart() {
-                const size = 6 + Math.random() * 10;
+                const size = 8 + Math.random() * 12;
                 const x = Math.random() * window.innerWidth;
                 const colors = ['#ff6b8b', '#ff8fab', '#ffb3c1', '#fcc2d7'];
                 const color = colors[Math.floor(Math.random() * colors.length)];
@@ -179,10 +203,51 @@
                 }, duration);
             }
             
+            function createButterfly() {
+                const butterfly = document.createElement('div');
+                butterfly.className = 'butterfly';
+                
+                // Random position at bottom
+                const startX = Math.random() * window.innerWidth;
+                butterfly.style.left = `${startX}px`;
+                butterfly.style.top = `${window.innerHeight + 20}px`;
+                
+                // Random size
+                const size = 15 + Math.random() * 20;
+                butterfly.style.width = `${size}px`;
+                butterfly.style.height = `${size}px`;
+                
+                // Random horizontal movement
+                const endX = startX + (Math.random() * 200 - 100);
+                
+                container.appendChild(butterfly);
+                
+                // Animate floating up with slight sway
+                const duration = 8000 + Math.random() * 5000;
+                butterfly.animate([
+                    { 
+                        transform: `translate(${0}px, 0) rotate(0deg)`,
+                        opacity: 0
+                    },
+                    { 
+                        transform: `translate(${endX - startX}px, -100vh) rotate(360deg)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                });
+                
+                // Remove after animation
+                setTimeout(() => {
+                    butterfly.remove();
+                }, duration);
+            }
+            
             // Generates points along a heart shape
             function generateHeartPoints(centerX, centerY, size) {
                 const points = [];
-                const steps = 300; // More points for smoother heart
+                const steps = 400; // More points for smoother, larger heart
                 
                 for (let i = 0; i < steps; i++) {
                     const t = (i / steps) * 2 * Math.PI;
@@ -191,8 +256,8 @@
                     const y = centerY - size * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) / 16;
                     
                     // Add some randomness to make it more organic
-                    const randX = (Math.random() - 0.5) * 15;
-                    const randY = (Math.random() - 0.5) * 15;
+                    const randX = (Math.random() - 0.5) * 20;
+                    const randY = (Math.random() - 0.5) * 20;
                     
                     points.push({
                         x: x + randX,
